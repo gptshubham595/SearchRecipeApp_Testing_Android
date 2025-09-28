@@ -2,6 +2,7 @@ package com.shubham.search.data.repository
 
 import com.shubham.search.data.local.RecipeDao
 import com.shubham.search.data.mappers.toDomain
+import com.shubham.search.data.mappers.toRecipeDetails
 import com.shubham.search.data.remote.SearchApiService
 import com.shubham.search.domain.model.Recipe
 import com.shubham.search.domain.model.RecipeDetails
@@ -18,7 +19,7 @@ class SearchRepoImpl @Inject constructor(
             val response = searchApiService.getRecipes(s)
             if (response.isSuccessful) {
                 response.body()?.meals?.let {
-                    Result.success(it.toDomain())
+                    Result.success(it.map { it.toDomain() })
                 } ?: run { Result.failure(Exception("error occurred")) }
             } else {
                 Result.failure(Exception("error occurred"))
@@ -34,11 +35,11 @@ class SearchRepoImpl @Inject constructor(
     }
 
     override suspend fun deleteRecipe(recipe: Recipe) {
-       recipeDao.deleteRecipe(recipe)
+        recipeDao.deleteRecipe(recipe)
     }
 
     override fun getAllRecipes(): Flow<List<Recipe>> {
-       return recipeDao.getAllRecipes()
+        return recipeDao.getAllRecipes()
     }
 
     override suspend fun getRecipeDetails(id: String): Result<RecipeDetails> {
@@ -47,7 +48,7 @@ class SearchRepoImpl @Inject constructor(
             if (response.isSuccessful) {
                 response.body()?.meals?.let {
                     if (it.isNotEmpty()) {
-                        Result.success(it.first().toDomain())
+                        Result.success(it.first().toRecipeDetails())
                     } else {
                         Result.failure(Exception("error occurred"))
                     }

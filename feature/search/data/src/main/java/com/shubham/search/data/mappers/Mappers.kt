@@ -5,21 +5,19 @@ import com.shubham.search.domain.model.Recipe
 import com.shubham.search.domain.model.RecipeDetails
 
 
-fun List<RecipeDTO>.toDomain(): List<Recipe> = map {
-    Recipe(
-        idMeal = it.idMeal,
-        strArea = it.strArea,
-        strMeal = it.strMeal,
-        strMealThumb = it.strMealThumb,
-        strCategory = it.strCategory,
-        strTags = it.strTags ?: "",
-        strYoutube = it.strYoutube ?: "",
-        strInstructions = it.strInstructions
-    )
-}
+fun RecipeDTO.toDomain() = Recipe(
+    idMeal = idMeal,
+    strArea = strArea,
+    strMeal = strMeal,
+    strMealThumb = strMealThumb,
+    strCategory = strCategory,
+    strTags = strTags ?: "",
+    strYoutube = strYoutube ?: "",
+    strInstructions = strInstructions
+)
 
 
-fun RecipeDTO.toDomain(): RecipeDetails {
+fun RecipeDTO.toRecipeDetails(): RecipeDetails {
     return RecipeDetails(
         idMeal = idMeal,
         strArea = strArea,
