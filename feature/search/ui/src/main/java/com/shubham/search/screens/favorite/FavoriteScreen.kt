@@ -74,7 +74,7 @@ fun FavoriteScreen(
         viewModel.navigation.flowWithLifecycle(lifecycleOwner.lifecycle)
             .collectLatest { navigation ->
                 when (navigation) {
-                    is FavoriteScreen.Navigation.GoToRecipeDetailsScreen -> {
+                    is FavoriteScreenStates.Navigation.GoToRecipeDetailsScreen -> {
                         navHostController.navigate(NavigationRoute.RecipeDetails.sendId(navigation.id))
                     }
                 }
@@ -101,36 +101,36 @@ fun FavoriteScreen(
                     DropdownMenuItem(text = { Text(text = "Alphabetical") }, onClick = {
                         selectedIndex.value = 0
                         showDropDown.value = showDropDown.value.not()
-                        viewModel.onEvent(FavoriteScreen.Event.AlphabeticalSort)
+                        viewModel.onEvent(FavoriteScreenStates.Event.AlphabeticalSort)
                     }, leadingIcon = {
                         RadioButton(selected = selectedIndex.value == 0, onClick = {
                             selectedIndex.value = 0
                             showDropDown.value = showDropDown.value.not()
-                            viewModel.onEvent(FavoriteScreen.Event.AlphabeticalSort)
+                            viewModel.onEvent(FavoriteScreenStates.Event.AlphabeticalSort)
                         })
                     })
 
                     DropdownMenuItem(text = { Text(text = "Less Ingredients") }, onClick = {
                         selectedIndex.value = 1
                         showDropDown.value = showDropDown.value.not()
-                        viewModel.onEvent(FavoriteScreen.Event.LessIngredientsSort)
+                        viewModel.onEvent(FavoriteScreenStates.Event.LessIngredientsSort)
                     }, leadingIcon = {
                         RadioButton(selected = selectedIndex.value == 1, onClick = {
                             selectedIndex.value = 1
                             showDropDown.value = showDropDown.value.not()
-                            viewModel.onEvent(FavoriteScreen.Event.LessIngredientsSort)
+                            viewModel.onEvent(FavoriteScreenStates.Event.LessIngredientsSort)
                         })
                     })
 
                     DropdownMenuItem(text = { Text(text = "Reset") }, onClick = {
                         selectedIndex.value = 2
                         showDropDown.value = showDropDown.value.not()
-                        viewModel.onEvent(FavoriteScreen.Event.ResetSort)
+                        viewModel.onEvent(FavoriteScreenStates.Event.ResetSort)
                     }, leadingIcon = {
                         RadioButton(selected = selectedIndex.value == 2, onClick = {
                             selectedIndex.value = 2
                             showDropDown.value = showDropDown.value.not()
-                            viewModel.onEvent(FavoriteScreen.Event.ResetSort)
+                            viewModel.onEvent(FavoriteScreenStates.Event.ResetSort)
                         })
                     })
 
@@ -197,7 +197,7 @@ fun FavoriteScreen(
                                 IconButton(
                                     onClick = {
                                         viewModel.onEvent(
-                                            FavoriteScreen.Event.DeleteRecipe(
+                                            FavoriteScreenStates.Event.DeleteRecipe(
                                                 it
                                             )
                                         )

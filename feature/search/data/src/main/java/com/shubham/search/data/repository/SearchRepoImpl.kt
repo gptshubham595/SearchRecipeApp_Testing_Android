@@ -7,8 +7,9 @@ import com.shubham.search.domain.model.Recipe
 import com.shubham.search.domain.model.RecipeDetails
 import com.shubham.search.domain.repository.SearchRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class SearchRepoImpl(
+class SearchRepoImpl @Inject constructor(
     private val searchApiService: SearchApiService,
     private val recipeDao: RecipeDao
 ) : SearchRepository {

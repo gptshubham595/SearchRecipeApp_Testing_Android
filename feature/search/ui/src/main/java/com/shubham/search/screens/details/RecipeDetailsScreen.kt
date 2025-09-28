@@ -64,8 +64,8 @@ fun RecipeDetailsScreen(
         viewModel.navigation.flowWithLifecycle(lifecycleOwner.lifecycle)
             .collectLatest { navigation ->
                 when (navigation) {
-                    com.shubham.search.screens.details.RecipeDetails.Navigation.GoToRecipeListScreen -> navHostController.popBackStack()
-                    is com.shubham.search.screens.details.RecipeDetails.Navigation.GoToMediaPlayer -> {
+                    RecipeDetailsStates.Navigation.GoToRecipeListScreen -> navHostController.popBackStack()
+                    is RecipeDetailsStates.Navigation.GoToMediaPlayer -> {
                         val videoId = navigation.youtubeUrl.split("v=").last()
                         navHostController.navigate(NavigationRoute.MediaPlayer.sendUrl(videoId))
                     }
@@ -80,7 +80,8 @@ fun RecipeDetailsScreen(
                 style = MaterialTheme.typography.bodyLarge
             )
         }, navigationIcon = {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null,
+            Icon(
+                imageVector = Icons.Default.ArrowBack, contentDescription = null,
                 modifier = Modifier.clickable {
                     onNavigationClick.invoke()
                 })
@@ -175,7 +176,7 @@ fun RecipeDetailsScreen(
                             text = "Watch Youtube Video",
                             modifier = Modifier.clickable {
                                 viewModel.onEvent(
-                                    com.shubham.search.screens.details.RecipeDetails.Event.GoToMediaPlayer(
+                                    com.shubham.search.screens.details.RecipeDetailsStates.Event.GoToMediaPlayer(
                                         recipeDetails.strYoutube
                                     )
                                 )

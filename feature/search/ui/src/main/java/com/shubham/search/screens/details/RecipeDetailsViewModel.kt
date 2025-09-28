@@ -31,38 +31,38 @@ class RecipeDetailsViewModel @Inject constructor(
     ViewModel() {
 
     private val _uiState =
-        MutableStateFlow(com.shubham.search.screens.details.RecipeDetails.UiState())
-    val uiState: StateFlow<com.shubham.search.screens.details.RecipeDetails.UiState> get() = _uiState.asStateFlow()
+        MutableStateFlow(com.shubham.search.screens.details.RecipeDetailsStates.UiState())
+    val uiState: StateFlow<com.shubham.search.screens.details.RecipeDetailsStates.UiState> get() = _uiState.asStateFlow()
 
     private val _navigation =
-        Channel<com.shubham.search.screens.details.RecipeDetails.Navigation>()
-    val navigation: Flow<com.shubham.search.screens.details.RecipeDetails.Navigation> get() = _navigation.receiveAsFlow()
+        Channel<com.shubham.search.screens.details.RecipeDetailsStates.Navigation>()
+    val navigation: Flow<com.shubham.search.screens.details.RecipeDetailsStates.Navigation> get() = _navigation.receiveAsFlow()
 
-    fun onEvent(event: com.shubham.search.screens.details.RecipeDetails.Event) {
+    fun onEvent(event: com.shubham.search.screens.details.RecipeDetailsStates.Event) {
         when (event) {
-            is com.shubham.search.screens.details.RecipeDetails.Event.FetchRecipeDetails -> recipeDetails(
+            is com.shubham.search.screens.details.RecipeDetailsStates.Event.FetchRecipeDetails -> recipeDetails(
                 event.id
             )
 
-            com.shubham.search.screens.details.RecipeDetails.Event.GoToRecipeListScreen -> viewModelScope.launch {
-                _navigation.send(com.shubham.search.screens.details.RecipeDetails.Navigation.GoToRecipeListScreen)
+            com.shubham.search.screens.details.RecipeDetailsStates.Event.GoToRecipeListScreen -> viewModelScope.launch {
+                _navigation.send(com.shubham.search.screens.details.RecipeDetailsStates.Navigation.GoToRecipeListScreen)
             }
 
-            is com.shubham.search.screens.details.RecipeDetails.Event.DeleteRecipe -> {
+            is com.shubham.search.screens.details.RecipeDetailsStates.Event.DeleteRecipe -> {
                 deleteRecipeUseCase.invoke(event.recipeDetails.toRecipe())
                     .launchIn(viewModelScope)
 
             }
 
-            is com.shubham.search.screens.details.RecipeDetails.Event.InsertRecipe -> {
+            is com.shubham.search.screens.details.RecipeDetailsStates.Event.InsertRecipe -> {
                 insertRecipeUseCase.invoke(event.recipeDetails.toRecipe())
                     .launchIn(viewModelScope)
             }
 
-            is com.shubham.search.screens.details.RecipeDetails.Event.GoToMediaPlayer -> {
+            is com.shubham.search.screens.details.RecipeDetailsStates.Event.GoToMediaPlayer -> {
                 viewModelScope.launch {
                     _navigation.send(
-                        com.shubham.search.screens.details.RecipeDetails.Navigation.GoToMediaPlayer(
+                        com.shubham.search.screens.details.RecipeDetailsStates.Navigation.GoToMediaPlayer(
                             event.youtubeUrl
                         )
                     )
@@ -76,20 +76,20 @@ class RecipeDetailsViewModel @Inject constructor(
             when (result) {
                 is NetworkResult.Error -> {
                     _uiState.update {
-                        com.shubham.search.screens.details.RecipeDetails.UiState(
+                        com.shubham.search.screens.details.RecipeDetailsStates.UiState(
                             error = UiText.RemoteString(result.message.toString())
                         )
                     }
                 }
 
                 is NetworkResult.Loading -> _uiState.update {
-                    com.shubham.search.screens.details.RecipeDetails.UiState(
+                    com.shubham.search.screens.details.RecipeDetailsStates.UiState(
                         isLoading = true
                     )
                 }
 
                 is NetworkResult.Success -> _uiState.update {
-                    com.shubham.search.screens.details.RecipeDetails.UiState(
+                    com.shubham.search.screens.details.RecipeDetailsStates.UiState(
                         data = result.data
                     )
                 }
@@ -109,33 +109,6 @@ class RecipeDetailsViewModel @Inject constructor(
             strYoutube,
             strInstructions
         )
-    }
-
-}
-
-object RecipeDetails {
-    data class UiState(
-        val isLoading: Boolean = false,
-        val error: UiText = UiText.Idle,
-        val data: RecipeDetails? = null
-    )
-
-    sealed interface Navigation {
-        data object GoToRecipeListScreen : Navigation
-        data class GoToMediaPlayer(val youtubeUrl: String) : Navigation
-    }
-
-    sealed interface Event {
-
-        data class FetchRecipeDetails(val id: String) : Event
-
-        data class InsertRecipe(val recipeDetails: RecipeDetails) : Event
-        data class DeleteRecipe(val recipeDetails: RecipeDetails) : Event
-
-        data object GoToRecipeListScreen : Event
-
-        data class GoToMediaPlayer(val youtubeUrl: String) : Event
-
     }
 
 }

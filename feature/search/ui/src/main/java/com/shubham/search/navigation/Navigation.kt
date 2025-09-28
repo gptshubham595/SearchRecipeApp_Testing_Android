@@ -7,10 +7,11 @@ import androidx.navigation.compose.navigation
 import com.shubham.common.navigation.FeatureApi
 import com.shubham.common.navigation.NavigationRoute
 import com.shubham.common.navigation.NavigationSubGraphRoute
-import com.shubham.search.screens.details.RecipeDetails
+import com.shubham.search.screens.details.RecipeDetailsStates
 import com.shubham.search.screens.details.RecipeDetailsScreen
 import com.shubham.search.screens.details.RecipeDetailsViewModel
 import com.shubham.search.screens.favorite.FavoriteScreen
+import com.shubham.search.screens.favorite.FavoriteScreenStates
 import com.shubham.search.screens.favorite.FavoriteViewModel
 import com.shubham.search.screens.recipe_list.RecipeList
 import com.shubham.search.screens.recipe_list.RecipeListScreen
@@ -45,19 +46,19 @@ class SearchFeatureApiImpl : SearchFeatureApi {
                 val mealId = it.arguments?.getString("id")
                 LaunchedEffect(key1 = mealId) {
                     mealId?.let {
-                        viewModel.onEvent(RecipeDetails.Event.FetchRecipeDetails(it))
+                        viewModel.onEvent(RecipeDetailsStates.Event.FetchRecipeDetails(it))
                     }
                 }
                 RecipeDetailsScreen(
                     viewModel = viewModel,
                     onNavigationClick = {
-                        viewModel.onEvent(RecipeDetails.Event.GoToRecipeListScreen)
+                        viewModel.onEvent(RecipeDetailsStates.Event.GoToRecipeListScreen)
                     },
                     onFavoriteClick = {
-                        viewModel.onEvent(RecipeDetails.Event.InsertRecipe(it))
+                        viewModel.onEvent(RecipeDetailsStates.Event.InsertRecipe(it))
                     },
                     onDelete = {
-                        viewModel.onEvent(RecipeDetails.Event.DeleteRecipe(it))
+                        viewModel.onEvent(RecipeDetailsStates.Event.DeleteRecipe(it))
                     }, navHostController = navHostController
                 )
             }
@@ -68,7 +69,7 @@ class SearchFeatureApiImpl : SearchFeatureApi {
                     navHostController = navHostController,
                     viewModel = viewModel,
                     onClick = { mealId ->
-                        viewModel.onEvent(FavoriteScreen.Event.GoToDetails(mealId))
+                        viewModel.onEvent(FavoriteScreenStates.Event.GoToDetails(mealId))
                     })
             }
 

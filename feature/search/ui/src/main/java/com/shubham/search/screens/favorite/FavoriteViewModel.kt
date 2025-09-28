@@ -2,11 +2,10 @@ package com.shubham.search.screens.favorite
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import com.shubham.common.utils.UiText
 import com.shubham.search.domain.model.Recipe
 import com.shubham.search.domain.use_cases.DeleteRecipeUseCase
 import com.shubham.search.domain.use_cases.GetAllRecipesFromLocalDbUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,74 +27,53 @@ class FavoriteViewModel @Inject constructor(
 
     private var originalList = mutableListOf<Recipe>()
 
-    private val _uiState = MutableStateFlow(FavoriteScreen.UiState())
-    val uiState: StateFlow<FavoriteScreen.UiState> get() = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(FavoriteScreenStates.UiState())
+    val uiState: StateFlow<FavoriteScreenStates.UiState> get() = _uiState.asStateFlow()
 
-    private val _navigation = Channel<FavoriteScreen.Navigation>()
-    val navigation: Flow<FavoriteScreen.Navigation> = _navigation.receiveAsFlow()
+    private val _navigation = Channel<FavoriteScreenStates.Navigation>()
+    val navigation: Flow<FavoriteScreenStates.Navigation> = _navigation.receiveAsFlow()
 
     init {
         getRecipeList()
     }
 
-    fun onEvent(event: FavoriteScreen.Event) {
+    fun onEvent(event: FavoriteScreenStates.Event) {
         when (event) {
-            FavoriteScreen.Event.AlphabeticalSort -> alphabeticalSort()
-            FavoriteScreen.Event.LessIngredientsSort -> lessIngredientsSort()
-            FavoriteScreen.Event.ResetSort -> resetSort()
-            is FavoriteScreen.Event.ShowDetails -> viewModelScope.launch {
-                _navigation.send(FavoriteScreen.Navigation.GoToRecipeDetailsScreen(event.id))
+            FavoriteScreenStates.Event.AlphabeticalSort -> alphabeticalSort()
+            FavoriteScreenStates.Event.LessIngredientsSort -> lessIngredientsSort()
+            FavoriteScreenStates.Event.ResetSort -> resetSort()
+            is FavoriteScreenStates.Event.ShowDetails -> viewModelScope.launch {
+                _navigation.send(FavoriteScreenStates.Navigation.GoToRecipeDetailsScreen(event.id))
             }
 
-            is FavoriteScreen.Event.DeleteRecipe -> deleteRecipe(event.recipe)
-            is FavoriteScreen.Event.GoToDetails -> viewModelScope.launch {
-                _navigation.send(FavoriteScreen.Navigation.GoToRecipeDetailsScreen(event.id))
+            is FavoriteScreenStates.Event.DeleteRecipe -> deleteRecipe(event.recipe)
+            is FavoriteScreenStates.Event.GoToDetails -> viewModelScope.launch {
+                _navigation.send(FavoriteScreenStates.Navigation.GoToRecipeDetailsScreen(event.id))
             }
         }
     }
 
-    private fun deleteRecipe(recipe: Recipe)= deleteRecipeUseCase.invoke(recipe)
+    private fun deleteRecipe(recipe: Recipe) = deleteRecipeUseCase.invoke(recipe)
         .launchIn(viewModelScope)
 
     private fun getRecipeList() =
         viewModelScope.launch {
             getAllRecipesFromLocalDbUseCase.invoke().collectLatest { list ->
                 originalList = list.toMutableList()
-                _uiState.update { FavoriteScreen.UiState(data = list) }
+                _uiState.update { FavoriteScreenStates.UiState(data = list) }
             }
         }
 
 
     fun alphabeticalSort() =
-        _uiState.update { FavoriteScreen.UiState(data = originalList.sortedBy { it.strMeal }) }
+        _uiState.update { FavoriteScreenStates.UiState(data = originalList.sortedBy { it.strMeal }) }
 
     fun lessIngredientsSort() =
-        _uiState.update { FavoriteScreen.UiState(data = originalList.sortedBy { it.strInstructions.length }) }
+        _uiState.update { FavoriteScreenStates.UiState(data = originalList.sortedBy { it.strInstructions.length }) }
 
     fun resetSort() {
-        _uiState.update { FavoriteScreen.UiState(data = originalList) }
+        _uiState.update { FavoriteScreenStates.UiState(data = originalList) }
     }
 
 }
 
-object FavoriteScreen {
-    data class UiState(
-        val isLoading: Boolean = false,
-        val error: UiText = UiText.Idle,
-        val data: List<Recipe>? = null
-    )
-
-    sealed interface Navigation {
-        data class GoToRecipeDetailsScreen(val id: String) : Navigation
-    }
-
-    sealed interface Event {
-        data object AlphabeticalSort : Event
-        data object LessIngredientsSort : Event
-        data object ResetSort : Event
-        data class ShowDetails(val id: String) : Event
-        data class DeleteRecipe(val recipe: Recipe) : Event
-        data class GoToDetails(val id:String):Event
-    }
-
-}
